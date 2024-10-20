@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# VS Code
+.vscode/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# OS generated files
+.DS_Store
+Thumbs.db
