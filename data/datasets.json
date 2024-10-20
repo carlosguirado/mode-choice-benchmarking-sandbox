@@ -1,29 +1,29 @@
 {
     "swissmetro_dataset": {
-      "file": "datasets/swissmetro/swissmetro.csv.gz",
+      "file": "mcbs/datasets/swissmetro/swissmetro.csv.gz",
       "description": "Swissmetro",
-      "target": "mode_choice",
-      "features": ["age", "income", "car_ownership", "distance"],
-      "n_samples": 1000,
-      "n_features": 4,
+      "target": "CHOICE",
+      "features": ["GROUP", "SURVEY", "SP", "ID", "PURPOSE", "FIRST", "TICKET", "WHO", "LUGGAGE", "AGE", "MALE", "INCOME", "GA", "ORIGIN", "DEST", "TRAIN_AV", "CAR_AV", "SM_AV", "TRAIN_TT", "TRAIN_CO", "TRAIN_HE", "SM_TT", "SM_CO", "SM_HE", "SM_SEATS", "CAR_TT", "CAR_CO"],
+      "n_samples": 10728, 
+      "n_features": 27,
       "task": "prediction"
     },
     "modecanada_dataset": {
-      "file": "datasets/modecanada/modecanada.csv.gz",
+      "file": "mcbs/datasets/modecanada/modecanada.csv.gz",
       "description": "ModeCanada",
-      "target": "commute_mode",
-      "features": ["age", "income", "car_ownership", "distance_to_work", "public_transport_accessibility"],
-      "n_samples": 5000,
-      "n_features": 5,
+      "target": "choice",
+      "features": ["Unnamed: 0", "case", "alt", "dist", "cost", "ivt", "ovt", "freq", "income", "urban", "noalt"],
+      "n_samples": 15520,
+      "n_features": 11,
       "task": "prediction"
     },
     "ltds_dataset": {
-      "file": "ltds.csv",
+      "file": "mcbs/datasets/ltds/ltds.csv.gz",
       "description": "London Travel Demand Survey (LTDS)",
       "target": "travel_mode",
-      "features": ["age", "income", "trip_purpose", "distance", "travel_time_car", "travel_time_train", "travel_time_bus", "travel_cost_car", "travel_cost_train", "travel_cost_bus"],
-      "n_samples": 10000,
-      "n_features": 10,
+      "features": ["trip_id", "household_id", "person_n", "trip_n", "purpose", "fueltype", "faretype", "bus_scale", "survey_year", "travel_year", "travel_month", "travel_date", "day_of_week", "start_time_linear", "age", "female", "driving_license", "car_ownership", "distance", "dur_walking", "dur_cycling", "dur_pt_total", "dur_pt_access", "dur_pt_rail", "dur_pt_bus", "dur_pt_int_total", "dur_pt_int_waiting", "dur_pt_int_walking", "pt_n_interchanges", "dur_driving", "cost_transit", "cost_driving_total", "cost_driving_fuel", "cost_driving_con_charge", "driving_traffic_percent"],
+      "n_samples": 81086,
+      "n_features": 35,
       "task": "prediction"
     }
   }

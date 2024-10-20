@@ -21,16 +21,16 @@ def display_basic_stats(X: pd.DataFrame, y: pd.Series):
     print("\nTarget Variable Statistics:")
     print(y.describe())
 
-def plot_feature_distributions(X: pd.DataFrame):
-    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-    axes = axes.ravel()
+#def plot_feature_distributions(X: pd.DataFrame):
+    #fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    #axes = axes.ravel()
     
-    for i, column in enumerate(X.columns[:4]):  # Plot first 4 features
-        X[column].hist(ax=axes[i])
-        axes[i].set_title(column)
+    #for i, column in enumerate(X.columns[:4]):  # Plot first 4 features
+        #X[column].hist(ax=axes[i])
+        #axes[i].set_title(column)
     
-    plt.tight_layout()
-    plt.show()
+    #plt.tight_layout()
+    #plt.show()
 
 def main():
     loader = DatasetLoader()
@@ -42,7 +42,7 @@ def main():
         try:
             X, y = loader.load_dataset(dataset_name)
             display_basic_stats(X, y)
-            plot_feature_distributions(X)
+            #plot_feature_distributions(X)
         except FileNotFoundError:
             print(f"Dataset file for '{dataset_name}' not found. Skipping.")
 
