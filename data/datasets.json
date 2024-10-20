@@ -1,0 +1,29 @@
+{
+    "swissmetro_dataset": {
+      "file": "datasets/swissmetro/swissmetro.csv.gz",
+      "description": "Swissmetro",
+      "target": "mode_choice",
+      "features": ["age", "income", "car_ownership", "distance"],
+      "n_samples": 1000,
+      "n_features": 4,
+      "task": "prediction"
+    },
+    "modecanada_dataset": {
+      "file": "datasets/modecanada/modecanada.csv.gz",
+      "description": "ModeCanada",
+      "target": "commute_mode",
+      "features": ["age", "income", "car_ownership", "distance_to_work", "public_transport_accessibility"],
+      "n_samples": 5000,
+      "n_features": 5,
+      "task": "prediction"
+    },
+    "ltds_dataset": {
+      "file": "ltds.csv",
+      "description": "London Travel Demand Survey (LTDS)",
+      "target": "travel_mode",
+      "features": ["age", "income", "trip_purpose", "distance", "travel_time_car", "travel_time_train", "travel_time_bus", "travel_cost_car", "travel_cost_train", "travel_cost_bus"],
+      "n_samples": 10000,
+      "n_features": 10,
+      "task": "prediction"
+    }
+  }
