@@ -6,3 +6,11 @@ MCBS is a collection of datasets and tools for benchmarking mode choice models i
 
 ```bash
 pip install -e .
+```
+
+## Usage
+
+## Contributing
+
+## License
+
