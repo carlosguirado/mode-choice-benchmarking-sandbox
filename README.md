@@ -1,78 +1,62 @@
 # Mode Choice Benchmarking Sandbox (MCBS)
 
-MCBS is a large collection of curated benchmark datasets for evaluating and comparing econometric and machine learning algorithms in the context of transportation mode choice modeling. 
-
-## Summary
-
-MCBS provides:
-- A collection of transportation mode choice datasets;
-- Tools for loading and preprocessing datasets;
-- Benchmarking utilities for comparing different machine learning models;
-- Visualization tools for dataset exploration and result analysis.
-
-## Dataset Format
-
-All datasets in MCBS are stored in a common format:
-- CSV files (gzip compressed);
-- First row contains column names;
-- The dependent variable/endpoint/outcome column is named 'target';
-- All other columns are considered features.
+A Python package for benchmarking discrete choice models for transportation mode choice analysis.
 
 ## Installation
 
-To install MCBS, run the following command:
+You can install MCBS using pip:
 
 ```bash
-pip install git+https://github.com/carlosguirado/mode-choice-benchmarking-sandbox.git
+pip install mcbs
 ```
 
-Or clone the repository and install in editable mode:
-
-```bash
-git clone https://github.com/your-username/mode-choice-benchmarking-sandbox.git
-cd mode-choice-benchmarking-sandbox
-pip install -e .
-```
-
-## Usage
-
-Here's a basic example of how to use MCBS:
+## Quick Start
 
 ```python
-from mcbs.datasets.loader import DatasetLoader
+from mcbs.benchmarking import Benchmark
+from mcbs.datasets import DatasetLoader
 
-# Initialize the dataset loader
-loader = DatasetLoader()
+# Load a dataset
+benchmark = Benchmark("swissmetro_dataset")
 
-# List available datasets
-print(loader.list_datasets())
+# Define your models
+models = {
+    "MNL - Base Model": your_model_function
+}
 
-# Load a specific dataset
-X, y = loader.load_dataset("example_dataset")
+# Run benchmark
+results = benchmark.run(models)
 
-# Now you can use X and y with your favorite machine learning library
-# For example, with scikit-learn:
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
-y_pred = model.predict(X_test)
-print(f"Accuracy: {accuracy_score(y_test, y_pred)}")
+# Compare results
+benchmark.compare_results(results)
 ```
 
-## Contributing
+## Features
 
-We welcome contributions to MCBS! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute.
+- Easy access to transportation mode choice datasets
+- Standardized benchmarking metrics
+- Support for Biogeme model estimation
+- Visualization of benchmark results
 
-## Citation
--Details to come-
-## Support
+## Datasets
 
-MCBS is an open source project developed by Carlos Guirado at the University of California, Berkeley. For support, please open an issue on the GitHub repository.
+Currently available datasets:
+- Swissmetro
+- London Transport
+- Mode Canada
+
+## Requirements
+
+- Python >=3.8
+- NumPy >=2.0.0
+- Pandas >=2.0.0
+- Biogeme >=3.2.14
+- Matplotlib >=3.0.0
 
 ## License
 
-MCBS is released under the [MIT License](LICENSE).
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contributing
+
+We welcome contributions! Please see our contributing guidelines for details.
