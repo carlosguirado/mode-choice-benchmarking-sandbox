@@ -1,0 +1,6 @@
+echo 'theme: jekyll-theme-cayman
+title: "MCBS Documentation"
+description: "Mode Choice Benchmarking Sandbox - A Python package for transportation choice modeling"
+baseurl: "/mode-choice-benchmarking-sandbox"
+github:
+  is_project_page: true' > docs/_config.yml
