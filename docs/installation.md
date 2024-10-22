@@ -1,15 +1,22 @@
-## Installation
+cat > docs/installation.md << 'EOL'
+---
+layout: default
+title: Installation Guide
+---
 
-Install MCBS from PyPI:
+# Installation
+
+MCBS can be installed using pip:
 
 ```bash
 pip install mcbs
 ```
 
-For development installation:
+## Requirements
 
-```bash
-git clone https://github.com/carlosguirado/mode-choice-benchmarking-sandbox.git
-cd mode-choice-benchmarking-sandbox
-pip install -e .
-```
+- Python >= 3.8
+- numpy >= 2.0.0
+- pandas >= 2.0.0
+- biogeme >= 3.2.14
+- matplotlib >= 3.0.0
+EOL

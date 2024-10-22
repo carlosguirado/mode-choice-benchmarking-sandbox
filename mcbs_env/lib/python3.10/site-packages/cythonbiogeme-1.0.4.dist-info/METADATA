@@ -1,0 +1,46 @@
+Metadata-Version: 2.1
+Name: cythonbiogeme
+Version: 1.0.4
+Summary: C++ part of the Biogeme package
+Author-email: Michel Bierlaire <michel.bierlaire@epfl.ch>
+Project-URL: Homepage, http://biogeme.epfl.ch
+Project-URL: Documentation, http://biogeme.epfl.ch/documents.html
+Project-URL: Code, https://github.com/michelbierlaire/cythonbiogeme
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Scientific/Engineering :: Mathematics
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: C++
+Classifier: Programming Language :: Cython
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: testing
+Requires-Dist: pytest>=8.2.2; extra == "testing"
+Requires-Dist: pytest-cov>=5.0.0; extra == "testing"
+Requires-Dist: tox>=4.15.1; extra == "testing"
+
+# CythonBiogeme
+[![PyPi](https://img.shields.io/pypi/v/cythonbiogeme.svg)](https://pypi.python.org/pypi/cythonbiogeme)
+
+Biogeme is an open source freeware designed for the maximum likelihood estimation of parametric models in general, with a special emphasis on discrete choice models.
+CythonBiogeme is the part of the package that involves C++ code, to be installed separately.
+
+## Install
+Biogeme requires Python >= 3.10 and can be installed [from PyPI](https://pypi.org/project/biogeme/).
+
+`pip install cythonbiogeme`
+
+Installing CythonBiogeme from source can be done after cloning the repository with the following command executed in 
+the directory where the file `setup.py`is located:
+
+`pip install .`
+
+## Documentation
+Further documentation is available on https://biogeme.epfl.ch/

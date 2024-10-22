@@ -1,0 +1,8 @@
+cat > _config.yml << 'EOL'
+title: Mode Choice Benchmarking Sandbox
+description: A Python package for benchmarking discrete choice models in transportation mode choice analysis
+theme: jekyll-theme-minimal
+show_downloads: true
+plugins:
+  - jekyll-relative-links
+EOL

@@ -1,0 +1,93 @@
+Example provided by ChatGPT
+
+Abstract class:
+
+// ILogFunction.h
+#include <stdexcept>
+#include <cmath>
+
+class ILogFunction {
+public:
+    virtual ~ILogFunction() = default;
+    virtual double computeLog(double x) const = 0;
+};
+
+
+Templated class:
+
+// LogFunction.h
+#include "ILogFunction.h"
+
+template <typename Implementation>
+class LogFunction : public ILogFunction {
+public:
+    double computeLog(double x) const override {
+        return Implementation().logImpl(x);
+    }
+};
+
+Implementations:
+
+// FastImplementation.h
+class FastImplementation {
+public:
+    double logImpl(double x) const {
+        return std::log(x);
+    }
+};
+
+// NormalImplementation.h
+class NormalImplementation {
+public:
+    double logImpl(double x) const {
+        if (x > 0) {
+            return std::log(x);
+        } else {
+            throw std::runtime_error("Value must be greater than 0");
+        }
+    }
+};
+
+// RobustImplementation.h
+class RobustImplementation {
+public:
+    double logImpl(double x) const {
+        if (x > 0) {
+            return std::log(x);
+        } else {
+            return -1e300;  // A very negative number
+        }
+    }
+};
+
+Usage:
+
+#include "ILogFunction.h"
+#include "LogFunction.h"
+#include "FastImplementation.h"
+#include "NormalImplementation.h"
+#include "RobustImplementation.h"
+
+int main() {
+    ILogFunction* logFuncFast = new LogFunction<FastImplementation>();
+    ILogFunction* logFuncNormal = new LogFunction<NormalImplementation>();
+    ILogFunction* logFuncRobust = new LogFunction<RobustImplementation>();
+
+    double x = -5.0;
+
+    std::cout << logFuncFast->computeLog(x) << std::endl;
+
+    try {
+        std::cout << logFuncNormal->computeLog(x) << std::endl;
+    } catch (const std::runtime_error& e) {
+        std::cout << e.what() << std::endl;
+    }
+
+    std::cout << logFuncRobust->computeLog(x) << std::endl;
+
+    delete logFuncFast;
+    delete logFuncNormal;
+    delete logFuncRobust;
+
+    return 0;
+}
