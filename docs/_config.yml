@@ -1,5 +1,25 @@
-remote_theme: pages-themes/minimal@v0.2.0
-plugins:
-  - jekyll-remote-theme
-title: Mode Choice Benchmarking Sandbox
+title: Mode Choice Benchmarking Sandbox (MCBS)
 description: A Python package for benchmarking discrete choice models
+remote_theme: pages-themes/cayman@v0.2.0
+plugins: 
+  - jekyll-remote-theme
+
+# Navigation
+nav_links:
+  - title: Home
+    url: /
+  - title: Installation
+    url: /docs/installation
+  - title: Documentation
+    url: /docs/
+  - title: Examples
+    url: /docs/examples
+  - title: Datasets
+    url: /docs/datasets
+  - title: GitHub
+    url: https://github.com/carlosguirado/mode-choice-benchmarking-sandbox
+
+show_downloads: true
+github:
+  is_project_page: true
+  repository_url: https://github.com/carlosguirado/mode-choice-benchmarking-sandbox
