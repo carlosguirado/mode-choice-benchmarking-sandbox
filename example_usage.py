@@ -1,50 +1,131 @@
-import sys
-import os
+"""
+Example usage of the benchmarker with Swissmetro, LTDS, and ModeCanada models
+"""
 
-# Add the project root directory to the Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from mcbs.datasets import DatasetLoader
+from mcbs.benchmarker import ModelBenchmarker
+from mcbs.models.swissmetro_model import (
+    MultinomialLogitModel as SwissMetroMNL,
+    NestedLogitModel as SwissMetroNL,
+    MixedLogitModel as SwissMetroML
+)
+from mcbs.models.ltds_model import (
+    MultinomialLogitModel as LTDSMNL,
+    NestedLogitModel as LTDSNL1,
+    NestedLogitModel2 as LTDSNL2
+)
+from mcbs.models.modecanada_model import (
+    MultinomialLogitModel as ModeCanadaMNL,
+    NestedLogitModel as ModeCanadaNL1,
+    NestedLogitModel2 as ModeCanadaNL2,
+    NestedLogitModel3 as ModeCanadaNL3
+)
 
-from mcbs.datasets.loader import DatasetLoader
-import pandas as pd
-import matplotlib.pyplot as plt
-
-def display_dataset_info(dataset_name: str, loader: DatasetLoader):
-    print(f"\nDataset: {dataset_name}")
-    info = loader.get_dataset_info(dataset_name)
-    for key, value in info.items():
-        print(f"{key}: {value}")
-
-def display_basic_stats(X: pd.DataFrame, y: pd.Series):
-    print("\nFeature Statistics:")
-    print(X.describe())
+def run_swissmetro_benchmark():
+    """Run benchmark for Swissmetro models"""
+    print("\nRunning Swissmetro Benchmark...")
     
-    print("\nTarget Variable Statistics:")
-    print(y.describe())
+    # Load data
+    loader = DatasetLoader()
+    data = loader.load_dataset("swissmetro_dataset")
+    
+    # Initialize benchmarker
+    benchmarker = ModelBenchmarker()
+    
+    # Define models to compare
+    models = [SwissMetroMNL, SwissMetroNL, SwissMetroML]
+    
+    # Run benchmark
+    results = benchmarker.run_benchmark(
+        data=data,
+        models=models,
+        dataset_name='swissmetro'
+    )
+    
+    # Print comparison
+    print("\nSwissmetro Models Comparison:")
+    print("=" * 50)
+    benchmarker.print_comparison()
+    
+    # Save results
+    benchmarker.export_results('swissmetro_benchmark_results.csv')
 
-#def plot_feature_distributions(X: pd.DataFrame):
-    #fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-    #axes = axes.ravel()
+def run_ltds_benchmark():
+    """Run benchmark for LTDS models"""
+    print("\nRunning LTDS Benchmark...")
     
-    #for i, column in enumerate(X.columns[:4]):  # Plot first 4 features
-        #X[column].hist(ax=axes[i])
-        #axes[i].set_title(column)
+    # Load data
+    loader = DatasetLoader()
+    data = loader.load_dataset("ltds_dataset")
     
-    #plt.tight_layout()
-    #plt.show()
+    # Initialize benchmarker
+    benchmarker = ModelBenchmarker()
+    
+    # Define models to compare
+    models = [LTDSMNL, LTDSNL1, LTDSNL2]
+    
+    # Run benchmark
+    results = benchmarker.run_benchmark(
+        data=data,
+        models=models,
+        dataset_name='ltds'
+    )
+    
+    # Print comparison
+    print("\nLTDS Models Comparison:")
+    print("=" * 50)
+    # Update model names in the comparison for clarity
+    results['model_name'] = results['model_name'].replace({
+        'MultinomialLogitModel': 'LTDS MNL',
+        'NestedLogitModel': 'LTDS NL (Motorized)',
+        'NestedLogitModel2': 'LTDS NL (Active)'
+    })
+    benchmarker.print_comparison()
+    
+    # Save results
+    benchmarker.export_results('ltds_benchmark_results.csv')
+
+def run_modecanada_benchmark():
+    """Run benchmark for ModeCanada models"""
+    print("\nRunning ModeCanada Benchmark...")
+    
+    # Load data
+    loader = DatasetLoader()
+    data = loader.load_dataset("modecanada_dataset")
+    
+    # Initialize benchmarker
+    benchmarker = ModelBenchmarker()
+    
+    # Define models to compare
+    models = [ModeCanadaMNL, ModeCanadaNL1, ModeCanadaNL2, ModeCanadaNL3]
+    
+    # Run benchmark
+    results = benchmarker.run_benchmark(
+        data=data,
+        models=models,
+        dataset_name='modecanada'
+    )
+    
+    # Print comparison
+    print("\nModeCanada Models Comparison:")
+    print("=" * 50)
+    # Update model names in the comparison for clarity
+    results['model_name'] = results['model_name'].replace({
+        'MultinomialLogitModel': 'ModeCanada MNL',
+        'NestedLogitModel': 'ModeCanada NL (Public Transport)',
+        'NestedLogitModel2': 'ModeCanada NL (Motorized)',
+        'NestedLogitModel3': 'ModeCanada NL (Private vs Public)'
+    })
+    benchmarker.print_comparison()
+    
+    # Save results
+    benchmarker.export_results('modecanada_benchmark_results.csv')
 
 def main():
-    loader = DatasetLoader()
-    print("Available datasets:", loader.list_datasets())
-
-    for dataset_name in loader.list_datasets():
-        display_dataset_info(dataset_name, loader)
-        
-        try:
-            X, y = loader.load_dataset(dataset_name)
-            display_basic_stats(X, y)
-            #plot_feature_distributions(X)
-        except FileNotFoundError:
-            print(f"Dataset file for '{dataset_name}' not found. Skipping.")
+    # Run benchmarks for all datasets
+    run_swissmetro_benchmark()
+    run_ltds_benchmark()
+    run_modecanada_benchmark()
 
 if __name__ == "__main__":
     main()
