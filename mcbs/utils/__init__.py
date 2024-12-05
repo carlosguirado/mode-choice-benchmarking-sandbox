@@ -1,5 +1,7 @@
-# mcbs/utils/__init__.py
+"""Utility functions and classes for the mode choice benchmarking system."""
 
-from .metrics import calculate_metrics
+from .biogeme_wrapper import BiogemeModelWrapper
+from .individual_parameters import *
+from .metrics import *
 
-__all__ = ['calculate_metrics']
+__all__ = ['BiogemeModelWrapper']
