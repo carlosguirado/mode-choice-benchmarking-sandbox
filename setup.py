@@ -32,9 +32,10 @@ setup(
         "pandas>=2.0.0",
         "biogeme>=3.2.14",
         "matplotlib>=3.0.0",
+        "requests>=2.25.0",
     ],
     include_package_data=True,
     package_data={
-        "mcbs": ["datasets/*.json", "datasets/*.csv", "datasets/*.csv.gz"],
+        "mcbs": ["datasets/*.json"],
     }
 )
