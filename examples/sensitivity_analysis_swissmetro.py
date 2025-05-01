@@ -1,4 +1,3 @@
-# ISSUE STORING RESULTS
 
 """
 Market Share Analysis Script for Swissmetro Models
