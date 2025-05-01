@@ -14,7 +14,9 @@ logger = logging.getLogger(__name__)
 
 # URL where datasets are hosted
 GITHUB_URL = 'https://raw.githubusercontent.com/carlosguirado/mcbs-datasets/main/datasets'
+GITHUB_API_URL = 'https://api.github.com/repos/carlosguirado/mcbs-datasets/contents/datasets'
 DEFAULT_CACHE_DIR = os.path.join(str(Path.home()), '.mcbs', 'datasets')
+METADATA_FILENAME = 'metadata.json'
 
 class DatasetLoader:
     def __init__(self, use_local_cache: bool = True, local_cache_dir: Optional[str] = None):
@@ -28,28 +30,131 @@ class DatasetLoader:
             Directory to use for caching datasets. If None, uses ~/.mcbs/datasets
         """
         self.datasets_path = os.path.dirname(__file__)
-        self.metadata_path = os.path.join(self.datasets_path, 'metadata.json')
-        self.datasets_metadata = self._load_metadata()
+        self.metadata_path = os.path.join(self.datasets_path, METADATA_FILENAME)
         self.use_local_cache = use_local_cache
         self.local_cache_dir = local_cache_dir if local_cache_dir else DEFAULT_CACHE_DIR
-
+        
+        # Initialize metadata from local file (will be used as fallback)
+        self.datasets_metadata = self._load_local_metadata()
+        
         # Create cache directory if it doesn't exist and caching is enabled
         if self.use_local_cache and not os.path.exists(self.local_cache_dir):
             os.makedirs(self.local_cache_dir, exist_ok=True)
             logger.info(f"Created local cache directory at {self.local_cache_dir}")
 
-    def _load_metadata(self) -> Dict[str, Any]:
-        """Load the metadata file containing dataset information."""
+    def _load_local_metadata(self) -> Dict[str, Any]:
+        """Load the metadata file containing dataset information from local file."""
         try:
             with open(self.metadata_path, 'r') as f:
                 return json.load(f)
         except json.JSONDecodeError:
-            raise ValueError(f"Error decoding JSON from {self.metadata_path}. Please check the file format.")
+            logger.warning(f"Error decoding JSON from {self.metadata_path}. Using empty metadata.")
+            return {}
         except FileNotFoundError:
-            raise FileNotFoundError(f"Metadata file not found at {self.metadata_path}")
+            logger.warning(f"Metadata file not found at {self.metadata_path}. Using empty metadata.")
+            return {}
+
+    def fetch_remote_metadata(self) -> Dict[str, Any]:
+        """Fetch metadata from the remote repository.
+        
+        Returns
+        -------
+        Dict[str, Any]
+            Metadata dictionary containing available datasets
+        """
+        try:
+            # Construct URL to the metadata.json file
+            metadata_url = f"{GITHUB_URL}/{METADATA_FILENAME}"
+            
+            # Fetch metadata
+            logger.info(f"Fetching metadata from: {metadata_url}")
+            response = requests.get(metadata_url)
+            response.raise_for_status()
+            
+            # Parse metadata
+            remote_metadata = json.loads(response.text)
+            
+            # Cache the metadata locally
+            if self.use_local_cache:
+                cache_path = os.path.join(self.local_cache_dir, METADATA_FILENAME)
+                os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+                with open(cache_path, 'w') as f:
+                    json.dump(remote_metadata, f, indent=2)
+                logger.info(f"Cached metadata to: {cache_path}")
+                
+            return remote_metadata
+        
+        except Exception as e:
+            logger.warning(f"Error fetching remote metadata: {str(e)}. Using local metadata as fallback.")
+            return self.datasets_metadata
+
+    def discover_available_datasets(self) -> List[str]:
+        """Dynamically discover available datasets in the remote repository.
+        
+        This method uses the GitHub API to list directories in the datasets repository,
+        providing real-time information about available datasets even if they
+        weren't present when the MCBS package was released.
+        
+        Returns
+        -------
+        List[str]
+            List of dataset names available in the remote repository
+        """
+        try:
+            # Fetch repository contents using GitHub API
+            logger.info(f"Querying GitHub API for available datasets: {GITHUB_API_URL}")
+            response = requests.get(GITHUB_API_URL)
+            response.raise_for_status()
+            
+            # Parse response
+            contents = response.json()
+            
+            # Filter for directories only (these should be dataset directories)
+            dataset_dirs = [item['name'] for item in contents if item['type'] == 'dir']
+            
+            # Convert directory names to dataset names
+            dataset_names = [f"{dir_name}_dataset" for dir_name in dataset_dirs]
+            
+            logger.info(f"Discovered {len(dataset_names)} datasets from remote repository")
+            return dataset_names
+            
+        except Exception as e:
+            logger.warning(f"Error discovering datasets from remote repository: {str(e)}. "
+                           f"Using local metadata as fallback.")
+            return list(self.datasets_metadata.keys())
+
+    def get_all_available_datasets(self) -> List[str]:
+        """Get a comprehensive list of all available datasets.
+        
+        This method combines information from:
+        1. The local metadata file
+        2. The remote metadata file (if accessible)
+        3. Dynamic discovery of directories in the repository
+        
+        Returns
+        -------
+        List[str]
+            List of all available dataset names
+        """
+        # Start with datasets from local metadata
+        all_datasets = set(self.datasets_metadata.keys())
+        
+        try:
+            # Add datasets from remote metadata
+            remote_metadata = self.fetch_remote_metadata()
+            all_datasets.update(remote_metadata.keys())
+            
+            # Add datasets from directory discovery
+            discovered_datasets = self.discover_available_datasets()
+            all_datasets.update(discovered_datasets)
+            
+        except Exception as e:
+            logger.warning(f"Error while trying to get all available datasets: {str(e)}")
+        
+        return sorted(list(all_datasets))
 
     def fetch_data(self, dataset_name: str, return_X_y: bool = False, dropna: bool = True) -> pd.DataFrame:
-        """Download a dataset, optionally store it locally, and return it.
+        """Download a dataset from the remote repository, optionally store it locally, and return it.
         
         Parameters
         ----------
@@ -66,8 +171,37 @@ class DatasetLoader:
             If return_X_y is False, returns the full DataFrame.
             If return_X_y is True, returns a tuple (X, y) of features and target.
         """
+        # Check if dataset exists in local metadata
         if dataset_name not in self.datasets_metadata:
-            raise ValueError(f"Dataset '{dataset_name}' not recognized. Available datasets: {', '.join(self.datasets_metadata.keys())}")
+            # Try to fetch remote metadata
+            remote_metadata = self.fetch_remote_metadata()
+            
+            # If dataset is in remote metadata, update local metadata
+            if dataset_name in remote_metadata:
+                logger.info(f"Found dataset '{dataset_name}' in remote metadata")
+                self.datasets_metadata = remote_metadata
+            else:
+                # Try to infer the dataset path from naming convention
+                # Assuming dataset_name format like "swissmetro_dataset"
+                if "_dataset" in dataset_name:
+                    base_name = dataset_name.replace("_dataset", "")
+                    inferred_filename = f"{base_name}/{base_name}.csv.gz"
+                    
+                    logger.info(f"Dataset '{dataset_name}' not found in metadata. "
+                                f"Attempting to infer path: {inferred_filename}")
+                    
+                    # Create metadata entry with inferred information
+                    self.datasets_metadata[dataset_name] = {
+                        "filename": inferred_filename,
+                        "description": f"Inferred {base_name} dataset",
+                        "n_samples": 0,
+                        "n_features": 0,
+                        "task": "prediction"
+                    }
+                else:
+                    available_datasets = self.get_all_available_datasets()
+                    raise ValueError(f"Dataset '{dataset_name}' not recognized. "
+                                     f"Available datasets: {', '.join(available_datasets)}")
         
         dataset_info = self.datasets_metadata[dataset_name]
         
@@ -107,7 +241,17 @@ class DatasetLoader:
         if return_X_y:
             target_col = dataset_info.get('target')
             if not target_col:
-                raise ValueError(f"Dataset '{dataset_name}' is missing target column information in metadata.")
+                # Try to identify a target column
+                potential_targets = ['choice', 'CHOICE', 'target', 'label', 'y', 'travel_mode', 'mode']
+                for col in potential_targets:
+                    if col in df.columns:
+                        target_col = col
+                        logger.info(f"Target column not specified. Using '{target_col}' as target.")
+                        break
+                
+                if not target_col:
+                    raise ValueError(f"Dataset '{dataset_name}' is missing target column information "
+                                     f"and none could be inferred from common column names.")
                 
             X = df.drop(target_col, axis=1)
             y = df[target_col]
@@ -144,14 +288,7 @@ class DatasetLoader:
                 raise ValueError(f"Unsupported file format: {file_extension}")
                 
         except requests.exceptions.RequestException as e:
-            # If download fails, try to load from local package directory as fallback
-            logger.warning(f"Error downloading dataset: {str(e)}. Trying local fallback...")
-            local_path = os.path.join(self.datasets_path, filename)
-            if os.path.exists(local_path):
-                logger.info(f"Using local fallback file: {local_path}")
-                return self._load_file(local_path)
-            else:
-                raise ConnectionError(f"Error downloading dataset: {str(e)}")
+            raise ConnectionError(f"Error downloading dataset: {str(e)}")
             
     def _download_and_cache_dataset(self, dataset_name: str, filename: str, cache_path: str) -> pd.DataFrame:
         """Download a dataset and save it to the cache directory."""
@@ -217,17 +354,30 @@ class DatasetLoader:
 
     def get_dataset_info(self, name: str) -> Dict[str, Any]:
         """Get metadata for a specific dataset."""
+        # Try to ensure we have the most up-to-date metadata
         if name not in self.datasets_metadata:
-            raise ValueError(f"Dataset '{name}' not recognized. Available datasets: {', '.join(self.datasets_metadata.keys())}")
-        
-        return self.datasets_metadata[name]
+            # Try to fetch from remote
+            remote_metadata = self.fetch_remote_metadata()
+            if name in remote_metadata:
+                self.datasets_metadata = remote_metadata
+            else:
+                # Check if we can discover this dataset
+                all_datasets = self.get_all_available_datasets()
+                if name not in all_datasets:
+                    raise ValueError(f"Dataset '{name}' not recognized. "
+                                    f"Available datasets: {', '.join(all_datasets)}")
+            
+        return self.datasets_metadata.get(name, {})
 
     def list_datasets(self) -> List[str]:
-        """List all available datasets."""
-        return list(self.datasets_metadata.keys())
-
-    def get_all_datasets_info(self) -> Dict[str, Dict[str, Any]]:
-        """Get metadata for all datasets."""
-        return self.datasets_metadata
-
-logger.info(f"DatasetLoader initialized. Available methods: {', '.join(method for method in dir(DatasetLoader) if not method.startswith('_'))}")
+        """List all available datasets from both local metadata and remote repository.
+        
+        This method provides a real-time list of datasets available in the remote repository,
+        even if they weren't present when the MCBS package was released.
+        
+        Returns
+        -------
+        List[str]
+            List of all available dataset names
+        """
+        return self.get_all_available_datasets()

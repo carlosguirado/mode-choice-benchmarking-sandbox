@@ -30,6 +30,24 @@ env.bak/
 venv.bak/
 .idea/
 .vscode/
+
 # Virtual Environments
 mcbs_env/
 mcbs_test_env/
+
+# Model output files
+*.pickle
+*.html
+__*model.iter
+__*mixed.iter
+__*mnl.iter
+__*nl.iter
+__*nl2.iter
+__*nl3.iter
+__*mnl_total.iter
+
+# Ignore all JSON files except metadata.json
+*.json
+!metadata.json
+!package.json
+!tsconfig.json

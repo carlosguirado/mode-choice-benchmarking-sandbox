@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="mcbs",
-    version="0.1.1",
+    version="0.1.2",
     author="Carlos Guirado",
     author_email="guirado@berkeley.edu",
     description="A benchmarking sandbox for mode choice models",
@@ -36,6 +36,6 @@ setup(
     ],
     include_package_data=True,
     package_data={
-        "mcbs": ["datasets/*.json"],
+        "mcbs": ["datasets/metadata.json"],
     }
 )
