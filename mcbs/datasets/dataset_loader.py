@@ -13,8 +13,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # URL where datasets are hosted
-GITHUB_URL = 'https://raw.githubusercontent.com/carlosguirado/mcbs-datasets/main/datasets'
+GITHUB_URL = 'https://raw.githubusercontent.com/carlosguirado/mcbs-datasets/master/datasets'
 GITHUB_API_URL = 'https://api.github.com/repos/carlosguirado/mcbs-datasets/contents/datasets'
+METADATA_URL = 'https://raw.githubusercontent.com/carlosguirado/mcbs-datasets/master/metadata.json'
 DEFAULT_CACHE_DIR = os.path.join(str(Path.home()), '.mcbs', 'datasets')
 METADATA_FILENAME = 'metadata.json'
 
@@ -63,8 +64,8 @@ class DatasetLoader:
             Metadata dictionary containing available datasets
         """
         try:
-            # Construct URL to the metadata.json file
-            metadata_url = f"{GITHUB_URL}/{METADATA_FILENAME}"
+            # Use direct URL to the metadata.json file
+            metadata_url = METADATA_URL
             
             # Fetch metadata
             logger.info(f"Fetching metadata from: {metadata_url}")
