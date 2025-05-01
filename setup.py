@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="mcbs",
-    version="0.1.1",  # Incremented version number
+    version="0.1.2",  # Incremented version number
     packages=find_packages(include=["mcbs", "mcbs.*"]),
     author="Carlos Guirado",
     author_email="your.email@example.com",
