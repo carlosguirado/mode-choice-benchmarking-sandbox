@@ -12,7 +12,7 @@ Based on the same structure as the Swissmetro model.
 
 import biogeme.biogeme as bio
 from biogeme import models
-from biogeme.expressions import Beta, Variable, bioDraws, log, MonteCarlo
+from biogeme.expressions import Beta, Variable, bioDraws, log, MonteCarlo, exp
 from biogeme.database import Database
 from biogeme.nests import OneNestForNestedLogit, NestsForNestedLogit
 from .base import BaseDiscreteChoiceModel
@@ -382,7 +382,7 @@ class MultinomialLogitModel_MC(BaseModeCanadaModel):
               betas['B_TIME'] * self.database.data['TRAIN_TIME'] + 
               betas['B_COST'] * self.database.data['TRAIN_COST'])
         
-        v2 = (0 + # ASC_CAR fixed to 0
+        v2 = (betas['ASC_CAR'] + #fixed to 0
               betas['B_TIME'] * self.database.data['CAR_TIME'] + 
               betas['B_COST'] * self.database.data['CAR_COST'])
         
@@ -407,7 +407,7 @@ class MultinomialLogitModel_MC(BaseModeCanadaModel):
                    betas['B_TIME'] * self.TRAIN_TIME + 
                    betas['B_COST'] * self.TRAIN_COST)
         elif alternative == 2:  # Car 
-            return (0 + # ASC_CAR fixed to 0
+            return (0 +  #betas['ASC_CAR'] + #fixed to 0
                    betas['B_TIME'] * self.CAR_TIME + 
                    betas['B_COST'] * self.CAR_COST)
         elif alternative == 3:  # Bus 
@@ -486,7 +486,7 @@ class NestedLogitModel3_MC(BaseModeCanadaModel):
         # Define nests: public transportation modes in one nest
         public = OneNestForNestedLogit(
             nest_param=MU_PUBLIC,
-            list_of_alternatives=[1, 3, 4],  # train, bus, air
+            list_of_alternatives=[1, 3, 4],  # train, bus
             name='public'
         )
         nests = NestsForNestedLogit(choice_set=list(V), tuple_of_nests=(public,))
@@ -528,7 +528,7 @@ class NestedLogitModel3_MC(BaseModeCanadaModel):
               betas['B_TIME'] * self.database.data['TRAIN_TIME'] + 
               betas['B_COST'] * self.database.data['TRAIN_COST']) 
         
-        v2 = (0 + # ASC_CAR fixed to 0
+        v2 = (0 + betas['ASC_CAR'] + #fixed to 0
               betas['B_TIME'] * self.database.data['CAR_TIME'] + 
               betas['B_COST'] * self.database.data['CAR_COST']) 
         
@@ -544,7 +544,7 @@ class NestedLogitModel3_MC(BaseModeCanadaModel):
         
         # Apply nesting structure
         mu = betas['MU_PUBLIC']
-        utilities[:, [0, 2, 3]] = utilities[:, [0, 2, 3]] / mu  # Scale utilities in public transport nest
+        #utilities[:, [0, 2, 3]] = utilities[:, [0, 2, 3]] / mu  # Scale utilities in public transport nest
         
         return utilities
 
@@ -558,7 +558,7 @@ class NestedLogitModel3_MC(BaseModeCanadaModel):
                    betas['B_TIME'] * self.TRAIN_TIME + 
                    betas['B_COST'] * self.TRAIN_COST) 
         elif alternative == 2:  # Car (not in nest)
-            return (0 + # ASC_CAR fixed to 0
+            return (0 + #betas['ASC_CAR'] + #fixed to 0
                    betas['B_TIME'] * self.CAR_TIME + 
                    betas['B_COST'] * self.CAR_COST)
         elif alternative == 3:  # Bus (in nest)
@@ -611,10 +611,11 @@ class MixedLogitModel_MC(BaseModeCanadaModel):
         ASC_AIR = Beta('ASC_AIR', 0, None, None, 0)
         B_COST = Beta('B_COST', 0, None, None, 0)
 
-        # Define random parameter for time
+       # Define random parameter for time (lognormal to ensure negative)
         B_TIME = Beta('B_TIME', 0, None, None, 0)
         B_TIME_S = Beta('B_TIME_S', 1, None, None, 0)  # Spread parameter
-        B_TIME_RND = B_TIME + B_TIME_S * bioDraws('b_time_rnd', 'NORMAL')
+        B_TIME_RND = -exp(B_TIME + B_TIME_S * bioDraws('b_time_rnd', 'NORMAL'))
+        #B_TIME_RND = B_TIME + B_TIME_S * bioDraws('b_time_rnd', 'NORMAL')
 
         # Utility functions with random coefficient
         V1 = (ASC_TRAIN + 
@@ -687,7 +688,7 @@ class MixedLogitModel_MC(BaseModeCanadaModel):
               betas['B_TIME'] * self.database.data['TRAIN_TIME'] + 
               betas['B_COST'] * self.database.data['TRAIN_COST'])
         
-        v2 = (0 + # ASC_CAR fixed to 0
+        v2 = (0 + #betas['ASC_CAR'] + #fixed to 0
               betas['B_TIME'] * self.database.data['CAR_TIME'] + 
               betas['B_COST'] * self.database.data['CAR_COST'])
         
@@ -710,7 +711,7 @@ class MixedLogitModel_MC(BaseModeCanadaModel):
                    betas['B_TIME'] * self.TRAIN_TIME + 
                    betas['B_COST'] * self.TRAIN_COST)
         elif alternative == 2:  # Car
-            return (0 + # ASC_CAR fixed to 0
+            return (0 + #betas['ASC_CAR'] + # fixed to 0
                    betas['B_TIME'] * self.CAR_TIME + 
                    betas['B_COST'] * self.CAR_COST)
         elif alternative == 3:  # Bus

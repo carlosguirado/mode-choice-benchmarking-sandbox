@@ -79,7 +79,7 @@ class ModelBenchmarker:
                                       ascending=False, 
                                       inplace=True)
     
-    def get_best_model(self, criterion: str = 'rho_squared_bar') -> str:
+    def get_best_model(self, criterion: str = 'final_ll') -> str:
         """
         Get the best performing model according to specified criterion.
         
@@ -89,8 +89,15 @@ class ModelBenchmarker:
         Returns:
             Name of the best performing model
         """
-        if self.metrics_df is None or criterion not in self.metrics_df.columns:
-            raise ValueError(f"Invalid criterion: {criterion}")
+        if self.metrics_df is None:
+            raise ValueError("No benchmark results available")
+            
+        # If the requested criterion isn't available, fall back to final_ll
+        if criterion not in self.metrics_df.columns:
+            if 'final_ll' in self.metrics_df.columns:
+                criterion = 'final_ll'
+            else:
+                raise ValueError("No valid comparison criteria available")
             
         best_idx = self.metrics_df[criterion].argmax()
         return self.metrics_df.iloc[best_idx]['model_name']
@@ -126,8 +133,15 @@ class ModelBenchmarker:
         print(display_metrics.to_string(index=False))
         
         # Print best model
-        best_model = self.get_best_model()
-        print("\nBest performing model (by rho squared bar):", best_model)
+        try:
+            if 'rho_squared_bar' in self.metrics_df.columns:
+                best_model = self.get_best_model('rho_squared_bar')
+                print("\nBest performing model (by rho squared bar):", best_model)
+            else:
+                best_model = self.get_best_model('final_ll')
+                print("\nBest performing model (by final log likelihood):", best_model)
+        except ValueError as e:
+            print("\nUnable to determine best model:", str(e))
     
     def export_results(self, filepath: str):
         """

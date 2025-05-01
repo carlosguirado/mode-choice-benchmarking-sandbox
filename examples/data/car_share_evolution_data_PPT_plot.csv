@@ -1,0 +1,9 @@
+Model,Variable,Multiplier,Car Share (%)
+MNL,cost,1.0,44.16079968241340
+MNL,cost,1.1,41.21
+MNL,cost,1.25,37.03
+MNL,cost,1.5,30.82
+NL,cost,1.0,44.16
+NL,cost,1.1,42.04
+NL,cost,1.25,38.96
+NL,cost,1.5,34.13
