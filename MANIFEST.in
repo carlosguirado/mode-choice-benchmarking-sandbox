@@ -1,11 +1,19 @@
-include README.md
+include *.md
+include LICENSE
 include mcbs/datasets/metadata.json
+recursive-include examples *.py *.ipynb
+recursive-include docs *.md *.yml
+
+# Exclude large files
 exclude mcbs/datasets/swissmetro/*.csv.gz
 exclude mcbs/datasets/ltds/*.csv.gz
 exclude mcbs/datasets/modecanada/*.csv.gz
-exclude tests/*
-exclude examples/*
-exclude docs/*
+exclude mcbs_env/*
+exclude test_env/*
+exclude mcbs_test_env/*
+exclude backup_datasets/*
+exclude test_cache/*
+exclude venv/*
 exclude .git*
 exclude .pytest_cache/*
 exclude *.pyc
